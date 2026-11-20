@@ -91,6 +91,44 @@ def _install_step(cmd, step):
                          'For WhisperX, allow at least 3 GB free disk and 8 GB RAM; package/model downloads need network access.')
 
 
+def _seed_silero_vad(python):
+    """Pre-fetch Silero VAD with git and pin its branch.
+
+    torch.hub probes https://github.com/<repo>/tree/main/ to pick a branch, which
+    proxied cloud sandboxes reject (HTTP 400) even when git clones work. Clone the
+    repo into the hub cache and pin ':master' so torch.hub uses the cache offline.
+    """
+    # Hugging Face's Xet transfer uses extra hosts (cas-server.xethub.hf.co) that
+    # restricted networks often block; plain HTTPS downloads work through the CDN.
+    os.environ.setdefault('HF_HUB_DISABLE_XET', '1')
+    hub = Path(os.environ.get('TORCH_HOME', Path.home() / '.cache' / 'torch')) / 'hub'
+    target = hub / 'snakers4_silero-vad_master'
+    if not (target / 'hubconf.py').is_file():
+        if target.exists():
+            shutil.rmtree(target)
+        hub.mkdir(parents=True, exist_ok=True)
+        _install_step(['git', 'clone', '--depth', '1', '--branch', 'master',
+                       'https://github.com/snakers4/silero-vad', target], 'Fetch Silero VAD')
+    # Word-level alignment needs NLTK's punkt_tab; nltk.download() fails its
+    # integrity check behind the proxy, so fetch and unpack the archive directly.
+    punkt = Path(os.environ.get('NLTK_DATA', Path.home() / 'nltk_data')) / 'tokenizers'
+    if not (punkt / 'punkt_tab' / 'english').is_dir():
+        import io, urllib.request, zipfile
+        punkt.mkdir(parents=True, exist_ok=True)
+        url = 'https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt_tab.zip'
+        print(f'[setup] Fetch NLTK punkt_tab: {url}', file=sys.stderr, flush=True)
+        with urllib.request.urlopen(url, timeout=120) as response:
+            zipfile.ZipFile(io.BytesIO(response.read())).extractall(punkt)
+    found = subprocess.run([str(python), '-c', 'import whisperx.vads.silero as m; print(m.__file__)'],
+                           capture_output=True, text=True)
+    module = Path(found.stdout.strip()) if found.returncode == 0 else None
+    if module and module.is_file():
+        source = module.read_text(encoding='utf-8')
+        pinned = source.replace("repo_or_dir='snakers4/silero-vad'", "repo_or_dir='snakers4/silero-vad:master'")
+        if pinned != source:
+            module.write_text(pinned, encoding='utf-8')
+
+
 def _install_macos(missing):
     if not _which('brew'):
         return False, 'Homebrew is missing. Install it from https://brew.sh, then rerun setup.'
@@ -289,8 +327,12 @@ def install_whisperx():
         _install_step([uv, 'venv', str(venv), '--python', '3.12'], 'Create WhisperX Python 3.12 environment')
         if platform.system() in ('Linux', 'Windows'):
             _install_step([uv, 'pip', 'install', '--python', python, 'torch==2.8.0', 'torchaudio==2.8.0',
+                           # Pin the matching CPU torchvision: otherwise WhisperX pulls a CUDA build
+                           # from PyPI that breaks transformers' Wav2Vec2 import (torchvision::nms).
+                           'torchvision==0.23.0',
                            '--index-url', 'https://download.pytorch.org/whl/cpu'], 'Install CPU PyTorch wheels')
         _install_step([uv, 'pip', 'install', '--python', python, f'whisperx=={WHISPERX_VERSION}'], 'Install WhisperX')
+        _seed_silero_vad(python)
     # Invalidate before warm-up: an interrupted repair is always safe to rerun.
     sentinel.unlink(missing_ok=True)
     cfg['whisperx_bin'] = str(executable)
