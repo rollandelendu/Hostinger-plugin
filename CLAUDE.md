@@ -1,5 +1,12 @@
 # Working notes for Claude
 
+## How to work with Rolland
+
+Be proactive. When asked to do something and you don't know how, or whether it
+will work, research it yourself first (web search, Apify docs via
+`search-apify-docs`, tool docs) and come back with the answer. Don't ask Rolland
+to find things out or hand the question back to him.
+
 ## Apify is the research tool, not just a downloader
 
 The Apify MCP is connected. Use it for any social media or web research: search
@@ -36,9 +43,17 @@ at the start of each fresh session.
      `streamers/youtube-video-downloader` with `storeInKVStore: true`).
   2. Run it with a `maxTotalChargeUsd` cap; tell the user the cost.
   3. Download the saved file from `api.apify.com` (allowed in the environment),
-     then run the watch skill on it locally.
+     then run the watch skill on it locally. The account's storages are likely
+     "Restricted" (Apify's default), so a bare record URL needs a token. In order:
+     a. Use the pre-signed record URL the Actor puts in its dataset output, if any.
+     b. Read the record through the Apify MCP resource (`resources/read` on
+        `https://api.apify.com/v2/key-value-stores/{storeId}/records/{key}`);
+        large records come back as a download URL.
+     c. Get the store via the MCP (its response includes `urlSigningSecretKey`
+        for writers) and sign the record URL per Apify's reference
+        implementation (apify-client-js `key_value_store.ts` `getRecordPublicUrl`).
   Not yet verified end to end: the first attempt was blocked by unpaid Apify
-  invoices. Confirm the file download works on the first real run.
+  invoices. Record which route works on the first real run.
 - No Gemini key is configured; the Gemini engine is not in use.
 
 For word-level timestamps (precise trims, text on the exact word), run
