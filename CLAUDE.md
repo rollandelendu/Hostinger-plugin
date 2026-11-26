@@ -52,8 +52,13 @@ at the start of each fresh session.
      c. Get the store via the MCP (its response includes `urlSigningSecretKey`
         for writers) and sign the record URL per Apify's reference
         implementation (apify-client-js `key_value_store.ts` `getRecordPublicUrl`).
-  Not yet verified end to end: the first attempt was blocked by unpaid Apify
-  invoices. Record which route works on the first real run.
+  **What actually worked (Instagram, Nov 2026):** run `apify/instagram-reel-scraper`
+  *without* `includeDownloadedVideo` (its download sub-run sat queued and timed
+  out; aborted). Its dataset gives `videoUrl` and `displayUrl` (thumbnail):
+  signed Instagram CDN links that download directly with curl. The CDN host
+  (e.g. `scontent-ssn1-1.cdninstagram.com`) must be in the environment's allowed
+  hosts; it can vary, so if a new `scontent-*` host shows up, add that exact host.
+  This route costs only the scrape (~$0.003 per reel).
 - No Gemini key is configured; the Gemini engine is not in use.
 
 For word-level timestamps (precise trims, text on the exact word), run
