@@ -25,6 +25,18 @@ and run it with a `maxTotalChargeUsd` cap (tell the user the cost).
   Then watch the video itself (below) and explain why it worked: the hook,
   visuals, script, caption and packaging.
 
+### Rolland's Instagram (@rollandelendu)
+
+- Apify plan: **Starter** (paid), so `includeSharesCount: true` works on
+  `apify/instagram-reel-scraper`. Shares are a key metric: his breakout reels
+  are the ones with high shares.
+- He posts each video as a **trial reel first** (shown to non-followers), then
+  as a regular reel. Near-duplicates with the same duration posted minutes apart
+  are trial/regular pairs, not mistakes. To tell them apart, run the scraper a
+  second time with `skipTrialReels: true`; posts missing from that run are
+  trials. Compare trials with trials and regulars with regulars, and compare
+  each video's trial vs regular result.
+
 ## Watching videos
 
 The `watch` skill (`.claude/skills/watch/`) turns a video file into timestamped
