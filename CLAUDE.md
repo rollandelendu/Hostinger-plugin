@@ -86,6 +86,14 @@ at the start of each fresh session.
   (e.g. `scontent-ssn1-1.cdninstagram.com`) must be in the environment's allowed
   hosts; it can vary, so if a new `scontent-*` host shows up, add that exact host.
   This route costs only the scrape (~$0.003 per reel).
+  **Facebook (worked Nov 2026):** `facebook.com/share/r/...` short links aren't
+  accepted by scrapers; resolve them first with the Apify `apify--web-fetch`
+  tool (its `fetch.loadedUrl` is the real `/reel/<id>/` URL). Then run
+  `apivault_labs/facebook-reels-video-scraper` with `workflow: "videoUrls"` and
+  that URL (~$0.004). Output has `videoMp4HdUrl`, caption, hashtags, reactions,
+  comments, and Facebook's own captions (which can be the wrong language;
+  transcribe with WhisperX instead). Views and shares came back null. The MP4
+  host (e.g. `video-dfw6-2.xx.fbcdn.net`) must be allowed, same as Instagram.
 - No Gemini key is configured; the Gemini engine is not in use.
 
 For word-level timestamps (precise trims, text on the exact word), run
