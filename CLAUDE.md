@@ -104,12 +104,18 @@ at the start of each fresh session.
   (this Actor requires `maxTotalChargeUsd` of at least $0.50).
   **YouTube (worked Nov 2026):** stats from `streamers/youtube-scraper`
   (`startUrls: [{url}]`, `maxResults: 1`; views, likes, comments, subscribers,
-  description, duration). Video from `streamers/youtube-video-downloader` with
-  `storeInKVStore: true`, `preferredQuality: "360p"` (enough for frames,
-  cheapest). Slow: a 9-min video took ~14 min, so start it with `waitSecs: 0`
-  and poll. Its dataset's `downloadedFileUrl` (an api.apify.com record in a
-  separate store) downloaded with plain curl. YouTube *links* only:
-  `youtu.be/ID?si=...` style is fine; pass `https://www.youtube.com/watch?v=ID`.
+  description, duration). **Video: use `hipersoft/youtube-downloader`**
+  (`videoUrls: [url]`, `format: "360"`). Race on a 9-min video (Nov 2026):
+  finished in 15 s, ~$0.003 flat per video, file in Apify storage with a signed
+  `downloadUrl` (curl, ~2 s, has audio). Fallback if it fails:
+  `marielise.dev/youtube-video-downloader` (`urls: [{url}]`, `quality: "360"`,
+  `residentialProxyMode: "disabled"`; 16 s, ~$0.01/min). Also worked:
+  `thenetaji/youtube-video-downloader` (26 s, `saveMedia: true`, needs
+  `region`), `scraper_one/yt-downloader` (23 s, ignores quality, serves from
+  `d3ggl2n0g1f8w9.cloudfront.net`, which is allowed). **Avoid
+  `streamers/youtube-video-downloader`: 14 min for the same video.**
+  Pass `https://www.youtube.com/watch?v=ID` (strip `youtu.be` share params).
+  Speed matters as much as price: when a scraper is slow, race alternatives.
   When Rolland only says "watch this", watch the video; don't add channel
   research unless he asks.
 - No Gemini key is configured; the Gemini engine is not in use.
