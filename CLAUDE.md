@@ -102,6 +102,16 @@ at the start of each fresh session.
   host approval is needed. Stats include plays, likes, comments, shares, saves.
   For the account comparison use `clockworks/tiktok-scraper` with `profiles`
   (this Actor requires `maxTotalChargeUsd` of at least $0.50).
+  **YouTube (worked Nov 2026):** stats from `streamers/youtube-scraper`
+  (`startUrls: [{url}]`, `maxResults: 1`; views, likes, comments, subscribers,
+  description, duration). Video from `streamers/youtube-video-downloader` with
+  `storeInKVStore: true`, `preferredQuality: "360p"` (enough for frames,
+  cheapest). Slow: a 9-min video took ~14 min, so start it with `waitSecs: 0`
+  and poll. Its dataset's `downloadedFileUrl` (an api.apify.com record in a
+  separate store) downloaded with plain curl. YouTube *links* only:
+  `youtu.be/ID?si=...` style is fine; pass `https://www.youtube.com/watch?v=ID`.
+  When Rolland only says "watch this", watch the video; don't add channel
+  research unless he asks.
 - No Gemini key is configured; the Gemini engine is not in use.
 
 For word-level timestamps (precise trims, text on the exact word), run
