@@ -37,21 +37,6 @@ and run it with a `maxTotalChargeUsd` cap (tell the user the cost).
   trials. Compare trials with trials and regulars with regulars, and compare
   each video's trial vs regular result.
 
-### Creators Rolland studies
-
-- **@it.iss.joao** (Instagram growth / content coaching). Rolland is testing his
-  format. Studied Nov 2026: no *post* caption, but every reel has full burned-in
-  subtitles (white, two lines, lower third), a black-box title in the first
-  seconds, proof screenshots, and a black-box keyword CTA at the end that he
-  also says out loud ("Comment 'training'", "DM me 999"). Free-offer keywords
-  (live training) pulled far more comments than paid-offer ones. Posts many
-  short 5–12 s clips (likely trials) plus 45–120 s talking-head reels.
-  His DM funnel (Rolland went through it, Nov 2026): keyword "999" → a human
-  qualifying question ("where are you from? timezones") → 27 s voice note →
-  link to a 13-min unlisted YouTube VSL titled "Founder Invitation" (thumbnail
-  = student results, 1.9M/1.5M views) → 6 s voice note → same-day follow-up
-  "Managed to have a look?". The VSL sells a $2,800 coaching program.
-
 ## Watching videos
 
 The `watch` skill (`.claude/skills/watch/`) turns a video file into timestamped
