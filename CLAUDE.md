@@ -94,6 +94,14 @@ at the start of each fresh session.
   comments, and Facebook's own captions (which can be the wrong language;
   transcribe with WhisperX instead). Views and shares came back null. The MP4
   host (e.g. `video-dfw6-2.xx.fbcdn.net`) must be allowed, same as Instagram.
+  **TikTok (worked Nov 2026):** `clockworks/tiktok-video-scraper` with
+  `postURLs` (short `tiktok.com/t/...` links work as-is),
+  `shouldDownloadVideos: true` (~$0.003). The video lands in the run's
+  key-value store; `get-key-value-store-record` on it returns a **signed
+  api.apify.com link** (route b above) that curl downloads directly, so no new
+  host approval is needed. Stats include plays, likes, comments, shares, saves.
+  For the account comparison use `clockworks/tiktok-scraper` with `profiles`
+  (this Actor requires `maxTotalChargeUsd` of at least $0.50).
 - No Gemini key is configured; the Gemini engine is not in use.
 
 For word-level timestamps (precise trims, text on the exact word), run
